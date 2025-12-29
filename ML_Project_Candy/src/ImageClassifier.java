@@ -1,3 +1,6 @@
+// Compiler : javac -cp "lib/*" -d bin src/*.java
+// Executer : export LD_LIBRARY_PATH=$PWD/lib/opencv:$LD_LIBRARY_PATH && java -cp "bin:lib/*" -Djava.library.path=lib/opencv ImageClassifier
+
 import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
@@ -22,7 +25,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class ImageClassifier {
     static {
-        System.loadLibrary("opencv_java460");
+        System.loadLibrary("opencv_java4100");
     }
 
     public static double[] imageToVector(String path, int width, int height) {
