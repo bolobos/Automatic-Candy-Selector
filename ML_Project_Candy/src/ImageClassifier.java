@@ -1,5 +1,5 @@
 // Compiler : javac -cp "lib/*" -d bin src/*.java
-// Executer : export LD_LIBRARY_PATH=$PWD/lib:$LD_LIBRARY_PATH && java -Xmx2048m -cp "bin:lib/*" -Djava.library.path=lib ImageClassifier
+// Executer : export LD_LIBRARY_PATH=$PWD/lib/opencv:$LD_LIBRARY_PATH && java -Xmx8000m -cp "bin:lib/*" -Djava.library.path=lib/opencv ImageClassifier
 
 import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
@@ -70,8 +70,8 @@ public class ImageClassifier {
         System.out.println("Dossier utilisé : " + baseDir);
         
         // Define size : larger size -> larger model
-        int imgWidth = 500;
-        int imgHeight = 500;
+        int imgWidth = 700;
+        int imgHeight = 700;
         
         // Extraire les noms de labels depuis les dossiers
         List<String> labelNames = extractLabelNames(baseDir.toString());
