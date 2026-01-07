@@ -1,5 +1,5 @@
 // Compiler : javac -cp "lib/*" -d bin src/*.java
-// Executer : export LD_LIBRARY_PATH=$PWD/lib/opencv:$LD_LIBRARY_PATH && java -cp "bin:lib/*" -Djava.library.path=lib/opencv ImageClassifier
+// Executer : export LD_LIBRARY_PATH=$PWD/lib:$LD_LIBRARY_PATH && java -Xmx2048m -cp "bin:lib/*" -Djava.library.path=lib ImageClassifier
 
 import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
@@ -28,6 +28,7 @@ public class ImageClassifier {
         System.loadLibrary("opencv_java4100");
     }
 
+    // Convert image (jpeg) to vector with a specify size
     public static double[] imageToVector(String path, int width, int height) {
         Mat img = Imgcodecs.imread(path, Imgcodecs.IMREAD_GRAYSCALE);
         if (img.empty()) return null;
@@ -38,6 +39,7 @@ public class ImageClassifier {
         return data;
     }
 
+    // Get all names of the candys thanks to the folders names
     public static List<String> extractLabelNames(String datasetPath) {
         List<String> labelNames = new ArrayList<>();
         File root = new File(datasetPath);
@@ -60,12 +62,14 @@ public class ImageClassifier {
         return labelNames;
     }
 
+
     public static void main(String[] args) {
 
         // Specify path (relative)
         Path baseDir = Paths.get(args.length > 0 ? args[0] : "nos_dataset/Entrainement");
         System.out.println("Dossier utilisé : " + baseDir);
         
+        // Define size : larger size -> larger model
         int imgWidth = 600;
         int imgHeight = 600;
         
@@ -115,9 +119,9 @@ public class ImageClassifier {
                 System.out.println("📂 Traitement de la classe : " + dir.getName());
 
                 // For to select each picture
+                // Convert all images to vectors
                 for (File file : dir.listFiles()) {
-                    if (file.getName().toLowerCase().endsWith(".jpg")
-                            || file.getName().toLowerCase().endsWith(".png")) {
+                    if (file.getName().toLowerCase().endsWith(".jpg") || file.getName().toLowerCase().endsWith(".png")) {
                         double[] vec = imageToVector(file.getAbsolutePath(), imgWidth, imgHeight);
                         if (vec != null) {
                             featuresList.add(vec);
@@ -139,10 +143,13 @@ public class ImageClassifier {
                 colNames[i] = "f" + i;
             }
 
+            // df contain all vectors 
             DataFrame df = DataFrame.of(X, colNames);
             df = df.merge(IntVector.of("label", y));
 
+            // Entrainement du modèle
             model = RandomForest.fit(Formula.lhs("label"), df);
+            
             System.out.println("✅ Modèle entraîné avec succès !");
 
             // Sauvegarde du modèle
