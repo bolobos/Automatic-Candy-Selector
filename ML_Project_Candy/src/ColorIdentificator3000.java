@@ -10,8 +10,8 @@ class ColorIdentificator3000 {
     static { System.loadLibrary(Core.NATIVE_LIBRARY_NAME); }
     
     // Variables globales pour les seuils Canny
-    static int threshold1 = 250;
-    static int threshold2 = 300;
+    static int minThreshold = 150;
+    static int maxThreshold = 300;
     static Mat image;
     static Mat imgray;
     static Mat hsvImage;
@@ -43,8 +43,8 @@ class ColorIdentificator3000 {
         System.out.println("\n=== Mode Auto: Recherche du bonbon ===");
         
         double bestArea = 0;
-        int bestT1 = threshold1;
-        int bestT2 = threshold2;
+        int bestT1 = minThreshold;
+        int bestT2 = maxThreshold;
         
         // Tester différents seuils pour trouver un contour fermé
         for (int t1 = 50; t1 <= 400; t1 += 25) {
@@ -68,9 +68,9 @@ class ColorIdentificator3000 {
         }
         
         if (bestArea > 0) {
-            threshold1 = bestT1;
-            threshold2 = bestT2;
-            System.out.println("\n>>> Meilleur résultat: Threshold1=" + threshold1 + ", Threshold2=" + threshold2);
+            minThreshold = bestT1;
+            maxThreshold = bestT2;
+            System.out.println("\n>>> Meilleur résultat: MinThreshold=" + minThreshold + ", MaxThreshold=" + maxThreshold + " ===");
             System.out.println(">>> Aire du contour: " + (int)bestArea + " pixels");
         } else {
             System.out.println("Aucun bonbon détecté, garde les valeurs actuelles");
@@ -80,7 +80,7 @@ class ColorIdentificator3000 {
     public static void updateEdges() {
         // Détection de contours avec Canny
         Mat edges = new Mat();
-        Imgproc.Canny(imgray, edges, threshold1, threshold2);
+        Imgproc.Canny(imgray, edges, minThreshold, maxThreshold);
         
         // Chercher le plus grand contour fermé
         MatOfPoint largestContour = findLargestClosedContour(edges);
@@ -142,13 +142,13 @@ class ColorIdentificator3000 {
         }
         
         // Ajouter les valeurs de threshold sur l'image des contours
-        Imgproc.putText(edgesResized, "Threshold1: " + threshold1, 
+        Imgproc.putText(edgesResized, "MinThreshold: " + minThreshold, 
                       new Point(10, 30), Imgproc.FONT_HERSHEY_SIMPLEX, 1.0, new Scalar(255, 255, 255), 2);
-        Imgproc.putText(edgesResized, "Threshold2: " + threshold2, 
+        Imgproc.putText(edgesResized, "MaxThreshold: " + maxThreshold, 
                       new Point(10, 70), Imgproc.FONT_HERSHEY_SIMPLEX, 1.0, new Scalar(255, 255, 255), 2);
         
         Mat imageWithCenter = imageResized.clone();
-        Mat colorSample = new Mat(150, 300, CvType.CV_8UC3, new Scalar(128, 128, 128));
+        Mat colorSample = new Mat(200, 350, CvType.CV_8UC3, new Scalar(128, 128, 128));
         
         if (centerX != -1 && centerY != -1) {
             // Calculer la couleur moyenne dans un rayon de 10 pixels autour du centre
@@ -188,26 +188,31 @@ class ColorIdentificator3000 {
             // Dessiner le cercle de moyennage (rayon réduit à 25%)
             Imgproc.circle(imageWithCenter, new Point(centerXResized, centerYResized), radius / 4, new Scalar(255, 165, 0), 1);
             
-            // Afficher les thresholds sur l'image
-            Imgproc.putText(imageWithCenter, "Threshold1: " + threshold1, 
-                          new Point(10, 30), Imgproc.FONT_HERSHEY_SIMPLEX, 1.0, new Scalar(0, 255, 0), 2);
-            Imgproc.putText(imageWithCenter, "Threshold2: " + threshold2, 
-                          new Point(10, 70), Imgproc.FONT_HERSHEY_SIMPLEX, 1.0, new Scalar(0, 255, 0), 2);
+            // Afficher les thresholds sur l'image (en bas pour être visibles)
+            int imgHeight = (int)displaySize.height;
+            Imgproc.putText(imageWithCenter, "MinThreshold: " + minThreshold, 
+                          new Point(10, imgHeight - 70), Imgproc.FONT_HERSHEY_SIMPLEX, 1.0, new Scalar(0, 255, 0), 2);
+            Imgproc.putText(imageWithCenter, "MaxThreshold: " + maxThreshold, 
+                          new Point(10, imgHeight - 30), Imgproc.FONT_HERSHEY_SIMPLEX, 1.0, new Scalar(0, 255, 0), 2);
             
             // Créer échantillon de couleur avec texte
-            colorSample = new Mat(150, 300, CvType.CV_8UC3, new Scalar(pixelColor[0], pixelColor[1], pixelColor[2]));
+            colorSample = new Mat(200, 350, CvType.CV_8UC3, new Scalar(pixelColor[0], pixelColor[1], pixelColor[2]));
+            Imgproc.putText(colorSample, "MinThreshold: " + minThreshold, 
+                          new Point(10, 30), Imgproc.FONT_HERSHEY_SIMPLEX, 0.6, new Scalar(255, 255, 255), 2);
+            Imgproc.putText(colorSample, "MaxThreshold: " + maxThreshold, 
+                          new Point(10, 60), Imgproc.FONT_HERSHEY_SIMPLEX, 0.6, new Scalar(255, 255, 255), 2);
             Imgproc.putText(colorSample, "BGR: " + (int)pixelColor[2] + "," + (int)pixelColor[1] + "," + (int)pixelColor[0], 
-                          new Point(10, 30), Imgproc.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar(255, 255, 255), 1);
+                          new Point(10, 100), Imgproc.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar(255, 255, 255), 1);
             Imgproc.putText(colorSample, "HSV: " + (int)pixelHSV[0] + "," + (int)pixelHSV[1] + "," + (int)pixelHSV[2], 
-                          new Point(10, 60), Imgproc.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar(255, 255, 255), 1);
+                          new Point(10, 130), Imgproc.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar(255, 255, 255), 1);
             
             // Afficher les infos dans la console
-            System.out.println("\n=== Threshold1=" + threshold1 + ", Threshold2=" + threshold2 + " ===");
+            System.out.println("\n=== MinThreshold=" + minThreshold + ", MaxThreshold=" + maxThreshold + " ===");
             System.out.println("Centre: (" + centerX + ", " + centerY + ")");
             System.out.println("BGR: B=" + (int)pixelColor[0] + ", G=" + (int)pixelColor[1] + ", R=" + (int)pixelColor[2]);
             System.out.println("HSV: H=" + (int)pixelHSV[0] + ", S=" + (int)pixelHSV[1] + ", V=" + (int)pixelHSV[2]);
         } else {
-            System.out.println("\n=== Threshold1=" + threshold1 + ", Threshold2=" + threshold2 + " ===");
+            System.out.println("\n=== MinThreshold=" + minThreshold + ", MaxThreshold=" + maxThreshold + " ===");
             System.out.println("Aucun pixel de contour trouvé!");
             Imgproc.putText(colorSample, "Aucun contour", new Point(50, 75), 
                           Imgproc.FONT_HERSHEY_SIMPLEX, 0.7, new Scalar(255, 255, 255), 2);
@@ -215,7 +220,7 @@ class ColorIdentificator3000 {
         
         // Afficher les résultats (images redimensionnées)
         HighGui.imshow("Contours (Canny)", edgesResized);
-        HighGui.imshow("Centre des Contours", imageWithCenter);
+        HighGui.imshow("Centre des Contours (Suzuki-Abe)", imageWithCenter);
         HighGui.imshow("Couleur au Centre", colorSample);
     }
     
@@ -223,7 +228,7 @@ class ColorIdentificator3000 {
         System.out.println("Welcome to OpenCV " + Core.VERSION);
         
         // Charger l'image
-        String imagePath = "./ML_Project_Candy/nos_dataset/Entrainement/Oeuf/PXL_20251015_080620233.RAW-01.COVER.jpg";
+        String imagePath = "./ML_Project_Candy/nos_dataset/Entrainement/Croco/20251015_100344.jpg";
         image = Imgcodecs.imread(imagePath);
         
         if (image.empty()) {
@@ -244,15 +249,15 @@ class ColorIdentificator3000 {
         
         // Créer les fenêtres
         namedWindow("Contours (Canny)");
-        namedWindow("Centre des Contours");
+        namedWindow("Centre des Contours (Suzuki-Abe)");
         namedWindow("Couleur au Centre");
         
         System.out.println("\n=== Interface Interactive ===");
         System.out.println("Utilisez les touches pour ajuster les seuils (modification +/-10):");
-        System.out.println("  '1' / '2' : Diminuer/Augmenter Threshold 1 (actuellement: " + threshold1 + ")");
-        System.out.println("  '3' / '4' : Diminuer/Augmenter Threshold 2 (actuellement: " + threshold2 + ")");
+        System.out.println("  '1' / '2' : Diminuer/Augmenter MinThreshold (actuellement: " + minThreshold + ")");
+        System.out.println("  '3' / '4' : Diminuer/Augmenter MaxThreshold (actuellement: " + maxThreshold + ")");
         System.out.println("  'a' : Mode Auto (détection automatique du bonbon)");
-        System.out.println("  'r' : Reset (250, 300)");
+        System.out.println("  'r' : Reset (150, 300)");
         System.out.println("  'ESC' : Quitter");
         System.out.println("\nImages redimensionnées à 25% pour un meilleur affichage");
         
@@ -269,25 +274,25 @@ class ColorIdentificator3000 {
                 autoAdjustThresholds();
                 updateEdges();
             } else if (key == '1') {
-                threshold1 = Math.max(0, threshold1 - 10);
-                System.out.println("Threshold 1: " + threshold1);
+                minThreshold = Math.max(0, minThreshold - 10);
+                System.out.println("MinThreshold: " + minThreshold);
                 updateEdges();
             } else if (key == '2') {
-                threshold1 = Math.min(500, threshold1 + 10);
-                System.out.println("Threshold 1: " + threshold1);
+                minThreshold = Math.min(500, minThreshold + 10);
+                System.out.println("MinThreshold: " + minThreshold);
                 updateEdges();
             } else if (key == '3') {
-                threshold2 = Math.max(0, threshold2 - 10);
-                System.out.println("Threshold 2: " + threshold2);
+                maxThreshold = Math.max(0, maxThreshold - 10);
+                System.out.println("MaxThreshold: " + maxThreshold);
                 updateEdges();
             } else if (key == '4') {
-                threshold2 = Math.min(500, threshold2 + 10);
-                System.out.println("Threshold 2: " + threshold2);
+                maxThreshold = Math.min(500, maxThreshold + 10);
+                System.out.println("MaxThreshold: " + maxThreshold);
                 updateEdges();
             } else if (key == 'r' || key == 'R') {
-                threshold1 = 250;
-                threshold2 = 300;
-                System.out.println("Reset: Threshold 1=" + threshold1 + ", Threshold 2=" + threshold2);
+                minThreshold = 150;
+                maxThreshold = 300;
+                System.out.println("Reset: MinThreshold=" + minThreshold + ", MaxThreshold=" + maxThreshold);
                 updateEdges();
             }
         }

@@ -1,5 +1,5 @@
 // Compiler : javac -cp "lib/*" -d bin src/*.java
-// Executer : export LD_LIBRARY_PATH=$PWD/lib:$LD_LIBRARY_PATH && java -Xmx8000m -cp "bin:lib/*" -Djava.library.path=lib ImageClassifier
+// Executer : export LD_LIBRARY_PATH=$PWD/lib:$LD_LIBRARY_PATH && java -Xmx2048m -cp "bin:lib/*" -Djava.library.path=lib ImageClassifier
 
 import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
