@@ -90,7 +90,7 @@ class ColorIdentificator3000 {
         System.out.println("Welcome to OpenCV " + Core.VERSION);
         
         // Charger l'image
-        String imagePath = "./ML_Project_Candy/nos_dataset/Entrainement/Croco/PXL_20251015_080355955.RAW-01.COVER.jpg";
+        String imagePath = "./ML_Project_Candy/nos_dataset/Entrainement/Croco/PXL_20251015_080424132.RAW-01.COVER.jpg";
         image = Imgcodecs.imread(imagePath);
         
         if (image.empty()) {
