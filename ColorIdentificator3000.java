@@ -27,5 +27,8 @@ class ColorIdentificator3000 {
         HighGui.resizeWindow("Candy Image", 800, 600);
         HighGui.waitKey(0);
         HighGui.destroyAllWindows();
+        
+        System.out.println("Programme terminé!");
+        System.exit(0);
     }
 }

@@ -3,35 +3,120 @@ import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.highgui.HighGui;
 import static org.opencv.highgui.HighGui.*;
+import java.util.ArrayList;
+import java.util.List;
 
 class ColorIdentificator3000 {
     static { System.loadLibrary(Core.NATIVE_LIBRARY_NAME); }
     
     // Variables globales pour les seuils Canny
-    static int threshold1 = 100;
-    static int threshold2 = 200;
+    static int threshold1 = 250;
+    static int threshold2 = 300;
     static Mat image;
     static Mat imgray;
     static Mat hsvImage;
+    static boolean autoMode = false;
+    
+    public static MatOfPoint findLargestClosedContour(Mat edges) {
+        // Trouver tous les contours
+        List<MatOfPoint> contours = new ArrayList<>();
+        Mat hierarchy = new Mat();
+        Imgproc.findContours(edges.clone(), contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+        
+        // Trouver le plus grand contour fermé
+        MatOfPoint largestContour = null;
+        double maxArea = 0;
+        
+        for (MatOfPoint contour : contours) {
+            double area = Imgproc.contourArea(contour);
+            if (area > maxArea && area > 500) { // Minimum 500 pixels (réduit de 1000)
+                maxArea = area;
+                largestContour = contour;
+            }
+        }
+        
+        hierarchy.release();
+        return largestContour;
+    }
+    
+    public static void autoAdjustThresholds() {
+        System.out.println("\n=== Mode Auto: Recherche du bonbon ===");
+        
+        double bestArea = 0;
+        int bestT1 = threshold1;
+        int bestT2 = threshold2;
+        
+        // Tester différents seuils pour trouver un contour fermé
+        for (int t1 = 50; t1 <= 400; t1 += 25) {
+            for (int t2 = t1 + 50; t2 <= 500; t2 += 25) {
+                Mat edges = new Mat();
+                Imgproc.Canny(imgray, edges, t1, t2);
+                
+                MatOfPoint largestContour = findLargestClosedContour(edges);
+                
+                if (largestContour != null) {
+                    double area = Imgproc.contourArea(largestContour);
+                    if (area > bestArea) {
+                        bestArea = area;
+                        bestT1 = t1;
+                        bestT2 = t2;
+                        System.out.println("Contour trouvé: T1=" + t1 + ", T2=" + t2 + ", Aire=" + (int)area);
+                    }
+                }
+                edges.release();
+            }
+        }
+        
+        if (bestArea > 0) {
+            threshold1 = bestT1;
+            threshold2 = bestT2;
+            System.out.println("\n>>> Meilleur résultat: Threshold1=" + threshold1 + ", Threshold2=" + threshold2);
+            System.out.println(">>> Aire du contour: " + (int)bestArea + " pixels");
+        } else {
+            System.out.println("Aucun bonbon détecté, garde les valeurs actuelles");
+        }
+    }
     
     public static void updateEdges() {
         // Détection de contours avec Canny
         Mat edges = new Mat();
         Imgproc.Canny(imgray, edges, threshold1, threshold2);
         
-        // Calculer la moyenne des positions des pixels de contour
-        long sumX = 0;
-        long sumY = 0;
-        int edgePixelCount = 0;
+        // Chercher le plus grand contour fermé
+        MatOfPoint largestContour = findLargestClosedContour(edges);
         
-        for (int y = 0; y < edges.rows(); y++) {
-            for (int x = 0; x < edges.cols(); x++) {
-                double[] pixel = edges.get(y, x);
-                if (pixel[0] == 255) {
-                    sumX += x;
-                    sumY += y;
-                    edgePixelCount++;
+        int centerX = -1;
+        int centerY = -1;
+        
+        // Si un contour est trouvé, calculer son centre avec les moments
+        if (largestContour != null) {
+            org.opencv.imgproc.Moments moments = Imgproc.moments(largestContour);
+            if (moments.get_m00() != 0) {
+                centerX = (int)(moments.get_m10() / moments.get_m00());
+                centerY = (int)(moments.get_m01() / moments.get_m00());
+            }
+        }
+        
+        // Sinon, utiliser la méthode originale (moyenne des pixels de contour)
+        if (centerX == -1 || centerY == -1) {
+            long sumX = 0;
+            long sumY = 0;
+            int edgePixelCount = 0;
+            
+            for (int y = 0; y < edges.rows(); y++) {
+                for (int x = 0; x < edges.cols(); x++) {
+                    double[] pixel = edges.get(y, x);
+                    if (pixel[0] == 255) {
+                        sumX += x;
+                        sumY += y;
+                        edgePixelCount++;
+                    }
                 }
+            }
+            
+            if (edgePixelCount > 0) {
+                centerX = (int)(sumX / edgePixelCount);
+                centerY = (int)(sumY / edgePixelCount);
             }
         }
         
@@ -42,23 +127,72 @@ class ColorIdentificator3000 {
         Imgproc.resize(image, imageResized, displaySize);
         Imgproc.resize(edges, edgesResized, displaySize);
         
+        // Dessiner le contour trouvé sur l'image redimensionnée
+        if (largestContour != null) {
+            List<MatOfPoint> contours = new ArrayList<>();
+            MatOfPoint scaledContour = new MatOfPoint();
+            Point[] points = largestContour.toArray();
+            Point[] scaledPoints = new Point[points.length];
+            for (int i = 0; i < points.length; i++) {
+                scaledPoints[i] = new Point(points[i].x / 4.0, points[i].y / 4.0);
+            }
+            scaledContour.fromArray(scaledPoints);
+            contours.add(scaledContour);
+            Imgproc.drawContours(imageResized, contours, 0, new Scalar(0, 255, 255), 2);
+        }
+        
+        // Ajouter les valeurs de threshold sur l'image des contours
+        Imgproc.putText(edgesResized, "Threshold1: " + threshold1, 
+                      new Point(10, 30), Imgproc.FONT_HERSHEY_SIMPLEX, 1.0, new Scalar(255, 255, 255), 2);
+        Imgproc.putText(edgesResized, "Threshold2: " + threshold2, 
+                      new Point(10, 70), Imgproc.FONT_HERSHEY_SIMPLEX, 1.0, new Scalar(255, 255, 255), 2);
+        
         Mat imageWithCenter = imageResized.clone();
         Mat colorSample = new Mat(150, 300, CvType.CV_8UC3, new Scalar(128, 128, 128));
         
-        if (edgePixelCount > 0) {
-            // Calculer la moyenne
-            int centerX = (int)(sumX / edgePixelCount);
-            int centerY = (int)(sumY / edgePixelCount);
+        if (centerX != -1 && centerY != -1) {
+            // Calculer la couleur moyenne dans un rayon de 10 pixels autour du centre
+            int radius = 10;
+            double sumB = 0, sumG = 0, sumR = 0;
+            double sumH = 0, sumS = 0, sumV = 0;
+            int pixelCount = 0;
             
-            // Extraire la couleur du pixel au centre (coordonnées originales)
-            double[] pixelColor = image.get(centerY, centerX);
-            double[] pixelHSV = hsvImage.get(centerY, centerX);
+            for (int y = Math.max(0, centerY - radius); y <= Math.min(image.rows() - 1, centerY + radius); y++) {
+                for (int x = Math.max(0, centerX - radius); x <= Math.min(image.cols() - 1, centerX + radius); x++) {
+                    // Vérifier si le pixel est dans le cercle de rayon 10
+                    int dx = x - centerX;
+                    int dy = y - centerY;
+                    if (dx*dx + dy*dy <= radius*radius) {
+                        double[] bgr = image.get(y, x);
+                        double[] hsv = hsvImage.get(y, x);
+                        sumB += bgr[0];
+                        sumG += bgr[1];
+                        sumR += bgr[2];
+                        sumH += hsv[0];
+                        sumS += hsv[1];
+                        sumV += hsv[2];
+                        pixelCount++;
+                    }
+                }
+            }
+            
+            // Calculer les moyennes
+            double[] pixelColor = new double[] {sumB / pixelCount, sumG / pixelCount, sumR / pixelCount};
+            double[] pixelHSV = new double[] {sumH / pixelCount, sumS / pixelCount, sumV / pixelCount};
             
             // Dessiner le centre (coordonnées réduites à 25%)
             int centerXResized = centerX / 4;
             int centerYResized = centerY / 4;
             Imgproc.circle(imageWithCenter, new Point(centerXResized, centerYResized), 4, new Scalar(0, 0, 255), -1);
             Imgproc.circle(imageWithCenter, new Point(centerXResized, centerYResized), 6, new Scalar(255, 255, 255), 2);
+            // Dessiner le cercle de moyennage (rayon réduit à 25%)
+            Imgproc.circle(imageWithCenter, new Point(centerXResized, centerYResized), radius / 4, new Scalar(255, 165, 0), 1);
+            
+            // Afficher les thresholds sur l'image
+            Imgproc.putText(imageWithCenter, "Threshold1: " + threshold1, 
+                          new Point(10, 30), Imgproc.FONT_HERSHEY_SIMPLEX, 1.0, new Scalar(0, 255, 0), 2);
+            Imgproc.putText(imageWithCenter, "Threshold2: " + threshold2, 
+                          new Point(10, 70), Imgproc.FONT_HERSHEY_SIMPLEX, 1.0, new Scalar(0, 255, 0), 2);
             
             // Créer échantillon de couleur avec texte
             colorSample = new Mat(150, 300, CvType.CV_8UC3, new Scalar(pixelColor[0], pixelColor[1], pixelColor[2]));
@@ -69,7 +203,6 @@ class ColorIdentificator3000 {
             
             // Afficher les infos dans la console
             System.out.println("\n=== Threshold1=" + threshold1 + ", Threshold2=" + threshold2 + " ===");
-            System.out.println("Pixels de contour: " + edgePixelCount);
             System.out.println("Centre: (" + centerX + ", " + centerY + ")");
             System.out.println("BGR: B=" + (int)pixelColor[0] + ", G=" + (int)pixelColor[1] + ", R=" + (int)pixelColor[2]);
             System.out.println("HSV: H=" + (int)pixelHSV[0] + ", S=" + (int)pixelHSV[1] + ", V=" + (int)pixelHSV[2]);
@@ -90,7 +223,7 @@ class ColorIdentificator3000 {
         System.out.println("Welcome to OpenCV " + Core.VERSION);
         
         // Charger l'image
-        String imagePath = "./ML_Project_Candy/nos_dataset/Entrainement/Croco/PXL_20251015_080424132.RAW-01.COVER.jpg";
+        String imagePath = "./ML_Project_Candy/nos_dataset/Entrainement/Oeuf/PXL_20251015_080620233.RAW-01.COVER.jpg";
         image = Imgcodecs.imread(imagePath);
         
         if (image.empty()) {
@@ -118,7 +251,8 @@ class ColorIdentificator3000 {
         System.out.println("Utilisez les touches pour ajuster les seuils (modification +/-10):");
         System.out.println("  '1' / '2' : Diminuer/Augmenter Threshold 1 (actuellement: " + threshold1 + ")");
         System.out.println("  '3' / '4' : Diminuer/Augmenter Threshold 2 (actuellement: " + threshold2 + ")");
-        System.out.println("  'r' : Reset (100, 200)");
+        System.out.println("  'a' : Mode Auto (détection automatique du bonbon)");
+        System.out.println("  'r' : Reset (250, 300)");
         System.out.println("  'ESC' : Quitter");
         System.out.println("\nImages redimensionnées à 25% pour un meilleur affichage");
         
@@ -131,6 +265,9 @@ class ColorIdentificator3000 {
             
             if (key == 27 || key == -1) { // ESC
                 break;
+            } else if (key == 'a' || key == 'A') {
+                autoAdjustThresholds();
+                updateEdges();
             } else if (key == '1') {
                 threshold1 = Math.max(0, threshold1 - 10);
                 System.out.println("Threshold 1: " + threshold1);
@@ -148,13 +285,15 @@ class ColorIdentificator3000 {
                 System.out.println("Threshold 2: " + threshold2);
                 updateEdges();
             } else if (key == 'r' || key == 'R') {
-                threshold1 = 100;
-                threshold2 = 200;
+                threshold1 = 250;
+                threshold2 = 300;
                 System.out.println("Reset: Threshold 1=" + threshold1 + ", Threshold 2=" + threshold2);
                 updateEdges();
             }
         }
         
         destroyAllWindows();
+        System.out.println("\nProgramme terminé!");
+        System.exit(0);
     }
 }
