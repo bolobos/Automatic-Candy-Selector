@@ -24,14 +24,14 @@ Write-Host "Utilisation de: $OPENCV_JAR" -ForegroundColor Green
 
 # Compilation
 Write-Host "`nCompilation..." -ForegroundColor Cyan
-javac -cp ".;$OPENCV_JAR" ColorIdentificator3000.java
+javac -cp "$OPENCV_JAR" -d ML_Project_Candy\bin ML_Project_Candy\src\ColorIdentificator3000.java
 
 if ($LASTEXITCODE -eq 0) {
     Write-Host "Compilation réussie!" -ForegroundColor Green
     
     # Exécution
     Write-Host "`nExécution..." -ForegroundColor Cyan
-    java -cp ".;$OPENCV_JAR" "-Djava.library.path=$OPENCV_LIB" ColorIdentificator3000
+    java -cp "ML_Project_Candy\bin;$OPENCV_JAR" "-Djava.library.path=$OPENCV_LIB" ColorIdentificator3000
 } else {
     Write-Host "Erreur de compilation!" -ForegroundColor Red
 }
