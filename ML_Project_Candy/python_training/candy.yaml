@@ -7,6 +7,7 @@ path: datasets/yolo_dataset
 # Dossiers d'images (relativement à 'path')
 train: train/images
 val: val/images
+test: test/images
 
 # Nombre de classes
 nc: 6
