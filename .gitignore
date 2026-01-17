@@ -20,6 +20,8 @@ ML_Project_Candy/python_training/datasets/*old.zip
 ML_Project_Candy/python_training/datasets/yolo_dataset.zip
 ML_Project_Candy/python_training/datasets/yolo_dataset/train/
 ML_Project_Candy/python_training/datasets/yolo_dataset/val/
+ML_Project_Candy/python_training/backups/
+
 # --- RESULTATS D'ENTRAINEMENT (RUNS) ---
 # On ignore tout le dossier runs pour éviter d'envoyer 
 # les 50 checkpoints intermédiaires inutiles.
