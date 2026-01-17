@@ -26,6 +26,7 @@ ML_Project_Candy/python_training/backups/
 # On ignore tout le dossier runs pour éviter d'envoyer 
 # les 50 checkpoints intermédiaires inutiles.
 runs/
+!runs/detect/candy_detector_yolov8m4/
 
 # --- EXCEPTIONS POUR LFS ---
 # Ici, on dit : "Même si c'est un .pt, ne l'ignore PAS au niveau global".
