@@ -1,0 +1,32 @@
+# Configuration YOLOv8 pour la détection de bonbons
+# Ce fichier définit la structure du dataset et les classes
+
+# Chemin racine du dataset (relatif à ce fichier)
+path: datasets/yolo_dataset
+
+# Dossiers d'images (relativement à 'path')
+train: train/images
+val: val/images
+
+# Nombre de classes
+nc: 6
+
+# Noms des classes (doit correspondre à label_names.txt)
+names:
+  0: Croco
+  1: Dragibus
+  2: Oeuf
+  3: Ourson
+  4: Schtroumpf
+  5: Tagada
+
+# Paramètres d'augmentation (optionnel, améliore la robustesse)
+hsv_h: 0.03   # Variation de teinte (augmenté)
+hsv_s: 0.7    # Variation de saturation (OK)
+hsv_v: 0.4    # Variation de luminosité (OK)
+degrees: 5.0  # Rotation aléatoire (OK)
+translate: 0.1 # Translation (OK)
+scale: 0.25   # Zoom (réduit de 0.5)
+flipud: 0.0   # Flip vertical (désactivé pour bonbons)
+fliplr: 0.5   # Flip horizontal - IMPORTANT
+mosaic: 1.0   # Augmentation mosaïque - IMPORTANT

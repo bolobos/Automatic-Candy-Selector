@@ -1,1 +1,32 @@
-ML_Project_Candy/*.model
+# --- ENVIRONNEMENT (On touche pas, c'est lourd) ---
+ML_Project_Candy/python_training/yolo_env/
+ML_Project_Candy/python_training/venv/
+__pycache__/
+*.pyc
+.DS_Store
+
+# --- IDE ---
+.vscode/
+.idea/
+*.iml
+
+# --- JAVA ---
+ML_Project_Candy/java_app/bin/
+ML_Project_Candy/out/
+*.class
+
+# --- DATASETS (Trop lourd, même pour LFS si c'est inutile) ---
+ML_Project_Candy/python_training/datasets/*old.zip
+ML_Project_Candy/python_training/datasets/yolo_dataset.zip
+ML_Project_Candy/python_training/datasets/yolo_dataset/train/
+ML_Project_Candy/python_training/datasets/yolo_dataset/val/
+# --- RESULTATS D'ENTRAINEMENT (RUNS) ---
+# On ignore tout le dossier runs pour éviter d'envoyer 
+# les 50 checkpoints intermédiaires inutiles.
+runs/
+
+# --- EXCEPTIONS POUR LFS ---
+# Ici, on dit : "Même si c'est un .pt, ne l'ignore PAS au niveau global".
+# C'est LFS qui va gérer le poids.
+!*.pt
+!*.onnx

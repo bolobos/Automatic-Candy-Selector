@@ -1,0 +1,137 @@
+╔════════════════════════════════════════════════════════════════════╗
+║          🍬 DÉTECTEUR DE BONBONS YOLOV8 - GUIDE RAPIDE            ║
+╚════════════════════════════════════════════════════════════════════╝
+
+📁 EMPLACEMENT
+--------------
+ML_Project_Candy/java_app/
+
+
+📋 ÉTAPE 1 : COMPILATION
+-------------------------
+
+Depuis Windows (PowerShell) :
+   cd C:\Users\remic\Documents\Automatic-Candy-Selector\ML_Project_Candy\java_app
+   wsl bash compile.sh
+
+Depuis WSL directement :
+   cd /mnt/c/Users/remic/Documents/Automatic-Candy-Selector/ML_Project_Candy/java_app
+   bash compile.sh
+
+OU manuellement :
+   javac -cp "lib/opencv-4100.jar" -d bin src/YOLOv8CandyDetector.java src/CandyDetectorApp.java
+
+
+🚀 ÉTAPE 2 : EXÉCUTION
+-----------------------
+
+Depuis Windows (PowerShell) :
+   wsl bash run.sh
+
+Depuis WSL :
+   cd /mnt/c/Users/remic/Documents/Automatic-Candy-Selector/ML_Project_Candy/java_app
+   bash run.sh
+
+Avec une image spécifique en argument :
+   bash run.sh ../python_training/datasets/nos_dataset/Test/20260107_143840.jpg
+
+
+💡 CE QUI SE PASSE
+------------------
+
+1. Le programme charge le modèle YOLOv8s entraîné (models/candy_yolov8.onnx)
+2. Vous voyez un menu avec 2 options :
+   - Option 1 : Choisir parmi les 15 premières images du dossier Test
+   - Option 2 : Saisir le chemin complet d'une image
+3. Le programme analyse l'image et affiche les bonbons détectés
+4. L'image avec les détections est sauvegardée dans detection_result.jpg
+
+
+📸 EXEMPLE D'UTILISATION
+------------------------
+
+$ bash run.sh
+✅ Modèle YOLOv8 chargé: models/candy_yolov8.onnx
+📝 Classes: Tagada, Dragibus, Ourson, Oeuf, Croco, Schtroumpf
+
+============================================================
+🍬 DÉTECTEUR DE BONBONS YOLOV8
+============================================================
+
+Options:
+1. Choisir une image du dossier Test (237 images)
+2. Saisir un chemin personnalisé
+
+Votre choix (1 ou 2): 1
+
+📂 Images disponibles dans Test:
+  1. 20251015_100034.jpg
+  2. 20260107_134237.jpg
+  3. 20260107_134331.jpg
+  ...
+
+Numéro de l'image (1-15) ou nom de fichier: 2
+
+🔍 Analyse de: 20260107_134237.jpg
+⏳ Détection en cours...
+
+============================================================
+🍬 RÉSULTATS DE DÉTECTION
+============================================================
+✅ 1 bonbon(s) détecté(s):
+
+  1. Schtroumpf - 95.2% de confiance
+     Position: [708, 1184] Taille: 785 x 1391 px
+
+============================================================
+💾 Résultat sauvegardé: detection_result.jpg
+============================================================
+
+
+📦 FICHIERS IMPORTANTS
+----------------------
+
+src/CandyDetectorApp.java        - Application principale (VOUS MODIFIEZ CECI)
+src/YOLOv8CandyDetector.java     - Classe de détection
+models/candy_yolov8.onnx         - Modèle entraîné (43 MB, mAP50: 97.85%)
+models/candy.names               - Liste des classes
+compile.sh                       - Script de compilation
+run.sh                          - Script d'exécution
+bin/                            - Classes compilées (.class)
+
+
+🎯 CLASSES DÉTECTÉES
+--------------------
+
+1. Tagada
+2. Dragibus
+3. Ourson
+4. Oeuf
+5. Croco
+6. Schtroumpf
+
+
+⚙️ PERFORMANCES DU MODÈLE
+--------------------------
+
+mAP50        : 97.85%
+mAP50-95     : 94.96%
+Précision    : 95.85%
+Recall       : 96.05%
+Temps/image  : ~100-200ms
+
+
+❓ DÉPANNAGE
+-------------
+
+Erreur "Impossible de charger OpenCV" :
+   → Utilisez run.sh au lieu d'appeler java directement
+   → Le script configure automatiquement LD_LIBRARY_PATH
+
+Image non trouvée :
+   → Vérifiez le chemin avec ls
+   → Utilisez des chemins relatifs depuis java_app/
+
+Classes non compilées :
+   → Relancez bash compile.sh
+   → Vérifiez que lib/opencv-4100.jar existe

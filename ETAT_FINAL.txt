@@ -1,0 +1,140 @@
+╔════════════════════════════════════════════════════════════════════╗
+║            🍬 PROJET CANDY DETECTOR - ÉTAT FINAL                   ║
+╚════════════════════════════════════════════════════════════════════╝
+
+📅 Date : 16 janvier 2026
+📦 Taille totale : 5.5 GB (5.3 GB dataset + 225 MB code/modèles)
+
+═══════════════════════════════════════════════════════════════════════
+                         📁 STRUCTURE FINALE
+═══════════════════════════════════════════════════════════════════════
+
+Automatic-Candy-Selector/
+│
+├── README.md                          # Documentation principale
+│
+└── ML_Project_Candy/
+    │
+    ├── java_app/                      # Application Java (225 MB)
+    │   ├── src/
+    │   │   ├── CandyDetectorApp.java      # ⭐ Application principale
+    │   │   └── YOLOv8CandyDetector.java   # Classe de détection
+    │   ├── bin/                           # Classes compilées (60 KB)
+    │   ├── lib/                           # Bibliothèques OpenCV
+    │   ├── models/
+    │   │   ├── candy_yolov8.onnx         # Modèle YOLOv8s (43 MB)
+    │   │   └── candy.names               # 6 classes
+    │   ├── compile.sh                    # Script compilation
+    │   ├── run.sh                        # ⭐ Script exécution
+    │   ├── DetecteurBonbons.bat         # Lancement Windows
+    │   └── GUIDE_UTILISATION.txt        # Instructions complètes
+    │
+    └── python_training/               # Entraînement Python (5.3 GB)
+        ├── datasets/
+        │   └── nos_dataset/
+        │       ├── Entrainement/         # 1294 images + labels
+        │       └── Test/                 # 228 images + labels
+        ├── scripts/
+        │   ├── train_yolov8_candy.py    # ⭐ Entraînement principal
+        │   ├── export_and_stats.py      # Export ONNX + stats
+        │   ├── create_val_from_test.py  # Création validation set
+        │   └── remove_val_from_train.py # Nettoyage data leakage
+        ├── models/                       # Modèles sklearn (legacy)
+        ├── yolo_models/
+        │   └── candy_yolov8.onnx        # Modèle exporté (43 MB)
+        └── candy.yaml                   # Configuration dataset YOLO
+
+
+═══════════════════════════════════════════════════════════════════════
+                    🎯 MODÈLE YOLOV8S ENTRAÎNÉ
+═══════════════════════════════════════════════════════════════════════
+
+📊 PERFORMANCES
+   mAP50        : 97.85%  (meilleure epoch 83)
+   mAP50-95     : 94.96%
+   Précision    : 95.85%
+   Recall       : 96.05%
+
+⏱️  ENTRAÎNEMENT
+   Modèle       : YOLOv8s (Small)
+   Epochs       : 100
+   Temps total  : 33 minutes
+   GPU          : NVIDIA RTX 3060 Ti
+
+📂 DATASET
+   Total        : 1522 images
+   Train        : 1294 images (85%)
+   Validation   : 228 images (15%)
+   Classes      : 6 (Tagada, Dragibus, Ourson, Oeuf, Croco, Schtroumpf)
+
+
+═══════════════════════════════════════════════════════════════════════
+                       🚀 UTILISATION RAPIDE
+═══════════════════════════════════════════════════════════════════════
+
+1️⃣  COMPILATION (une seule fois)
+   cd ML_Project_Candy/java_app
+   bash compile.sh
+
+2️⃣  EXÉCUTION
+   bash run.sh
+
+   → Menu interactif pour choisir une image
+   → Résultat sauvegardé dans detection_result.jpg
+
+
+═══════════════════════════════════════════════════════════════════════
+                    🧹 NETTOYAGE EFFECTUÉ
+═══════════════════════════════════════════════════════════════════════
+
+✅ SUPPRIMÉ :
+   • Environnements virtuels obsolètes (venv_yolo, yolo_env)
+     → Maintenant : ~/yolo_training_env (WSL home)
+   
+   • READMEs dupliqués (5 fichiers)
+     → Gardé : README.md + GUIDE_UTILISATION.txt
+   
+   • Scripts shell redondants (6 fichiers)
+     → Gardé : compile.sh + run.sh
+   
+   • Modèles YOLO de base téléchargés (yolo26n.pt, yolov8s.pt)
+     → Utilise uniquement candy_yolov8.onnx entraîné
+   
+   • Fichiers cache Python (__pycache__, *.pyc)
+   
+   • Fichiers racine en double
+     → Code réorganisé dans java_app/ et python_training/
+   
+   • Dossiers vides (docs/, out/, resources/)
+
+
+═══════════════════════════════════════════════════════════════════════
+                      ⚙️  CONFIGURATION SYSTÈME
+═══════════════════════════════════════════════════════════════════════
+
+OS        : Windows avec WSL Ubuntu
+Python    : 3.12 (env: ~/yolo_training_env)
+Java      : OpenJDK avec OpenCV 4.10.0
+GPU       : NVIDIA RTX 3060 Ti (optionnel)
+
+
+═══════════════════════════════════════════════════════════════════════
+                         📖 DOCUMENTATION
+═══════════════════════════════════════════════════════════════════════
+
+• README.md                    → Vue d'ensemble du projet
+• java_app/GUIDE_UTILISATION.txt → Guide complet Java
+• python_training/scripts/     → Scripts Python documentés
+
+
+═══════════════════════════════════════════════════════════════════════
+                      ✨ PROJET PRÊT À L'EMPLOI
+═══════════════════════════════════════════════════════════════════════
+
+✅ Modèle entraîné et optimisé
+✅ Application Java fonctionnelle
+✅ Code nettoyé et organisé
+✅ Documentation complète
+✅ Scripts de réentraînement disponibles
+
+🎓 Projet IN450/451 - Machine Learning - Esme Sudria
