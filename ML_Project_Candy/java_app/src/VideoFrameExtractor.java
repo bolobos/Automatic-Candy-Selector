@@ -21,7 +21,7 @@ public class VideoFrameExtractor {
     private static final int FRAMES_PER_SECOND = 5;
     
     public static void main(String[] args) {
-        String videoFolderPath = "/media/pc_remi/Synchro/ESISAR/3_Semestre/IN451/Bonbons/video/Photos-3-001";
+        String videoFolderPath = "/mnt/c/Users/remic/Documents/Automatic-Candy-Selector";
         
         File videoFolder = new File(videoFolderPath);
         

@@ -23,8 +23,10 @@ def prepare_dataset():
     # Créer la structure YOLO
     (dest_base / "images" / "train").mkdir(parents=True, exist_ok=True)
     (dest_base / "images" / "val").mkdir(parents=True, exist_ok=True)
+    (dest_base / "images" / "test").mkdir(parents=True, exist_ok=True)
     (dest_base / "labels" / "train").mkdir(parents=True, exist_ok=True)
     (dest_base / "labels" / "val").mkdir(parents=True, exist_ok=True)
+    (dest_base / "labels" / "test").mkdir(parents=True, exist_ok=True)
     
     # Lire les classes depuis label_names.txt
     classes = []

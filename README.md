@@ -1,6 +1,18 @@
 # 🍬 Automatic Candy Selector
 
-Système de détection automatique de bonbons utilisant YOLOv8.
+Système intelligent de détection et tri automatique de bonbons utilisant YOLOv8 et OpenCV.
+
+## 📝 Description du projet
+
+Ce projet permet de détecter automatiquement différents types de bonbons dans des images ou des vidéos en utilisant un modèle de deep learning YOLOv8. Le système extrait des frames de vidéos, détecte les bonbons présents, et peut potentiellement identifier leurs couleurs pour un tri automatisé.
+
+**Pipeline complet** :
+1. **Extraction de frames** depuis des vidéos de bonbons
+2. **Annotation automatique** avec un modèle pré-entraîné
+3. **Correction manuelle** des annotations via interface graphique
+4. **Entraînement** d'un modèle YOLOv8 personnalisé
+5. **Détection** en Java avec OpenCV pour intégration système
+6. **Classification de couleurs** (théorique, en développement)
 
 ## 📁 Structure du projet
 
@@ -33,17 +45,44 @@ ML_Project_Candy/
 
 ## 🚀 Utilisation rapide
 
-### Application Java (Détection)
+### 1. Détection sur une image (Java)
 
 ```bash
 cd ML_Project_Candy/java_app
-bash compile.sh                # Compilation (1 seule fois)
-bash run.sh                    # Lancer l'application
+wsl bash compile.sh                # Compilation (1 seule fois)
+wsl bash run.sh                    # Lancer l'application
 ```
 
-L'application propose un menu pour choisir une image et affiche les bonbons détectés.
+L'application propose un menu pour choisir une image et affiche les bonbons détectés avec leurs bounding boxes.
 
-### Entraînement Python (si besoin)
+### 2. Extraction de frames depuis une vidéo
+
+```bash
+cd ML_Project_Candy/java_app
+# Placer votre vidéo dans le dossier parent
+# Modifier src/VideoFrameExtractor.java pour pointer vers le dossier de la vidéo
+javac -cp 'lib/opencv-4100.jar' -d bin src/VideoFrameExtractor.java
+export LD_LIBRARY_PATH=$PWD/lib/opencv:$LD_LIBRARY_PATH
+java -cp 'bin:lib/opencv-4100.jar' -Djava.library.path=lib/opencv VideoFrameExtractor
+```
+
+Extrait 5 images par seconde dans un dossier `{nom_video}_frames/`.
+
+### 3. Annotation manuelle des images
+
+```bash
+cd ML_Project_Candy/python_training
+python check_annotations_windows.py
+```
+
+Interface graphique pour vérifier et corriger les annotations :
+- Clic + Glisser : Créer une bounding box
+- 0-5 : Changer la classe (0:Tagada, 1:Dragibus, 2:Ourson, 3:Oeuf, 4:Croco, 5:Schtroumpf)
+- Sélectionner une box + 0-5 : Changer la classe de la box sélectionnée
+- d : Supprimer une box
+- ESPACE : Image suivante
+
+### 4. Entraînement du modèle (si besoin)
 
 ```bash
 cd ML_Project_Candy/python_training

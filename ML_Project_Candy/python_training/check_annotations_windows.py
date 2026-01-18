@@ -12,8 +12,8 @@ sys.path.insert(0, script_dir)
 try:
     from check_and_fix_annotations import AnnotationEditor
     
-    images_dir = "datasets/yolo_dataset/train/images"
-    labels_dir = "datasets/yolo_dataset/train/labels"
+    images_dir = "/mnt/c/Users/remic/Documents/Automatic-Candy-Selector/PXL_20260118_100006771_frames"
+    labels_dir = "/mnt/c/Users/remic/Documents/Automatic-Candy-Selector/PXL_20260118_100006771_frames"
     classes_file = "datasets/label_names.txt"
     
     editor = AnnotationEditor(images_dir, labels_dir, classes_file)

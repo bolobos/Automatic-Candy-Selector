@@ -45,14 +45,14 @@ class AnnotationEditor:
         self.resize_threshold = 10  # Distance pour détecter les coins/bords
         self.image_x_offset = 0  # Offset horizontal pour images portrait centrées
         
-        # Couleurs pour chaque classe
+        # Couleurs pour chaque classe (dans l'ordre du fichier classes)
         self.colors = [
-            (255, 0, 0),    # Croco - Rouge
-            (0, 255, 0),    # Dragibus - Vert
-            (0, 0, 255),    # Oeuf - Bleu
-            (255, 255, 0),  # Ourson - Cyan
-            (255, 0, 255),  # Schtroumpf - Magenta
-            (0, 255, 255),  # Tagada - Jaune
+            (0, 255, 255),  # 0: Tagada - Jaune
+            (0, 255, 0),    # 1: Dragibus - Vert
+            (255, 255, 0),  # 2: Ourson - Cyan
+            (0, 0, 255),    # 3: Oeuf - Bleu
+            (255, 0, 0),    # 4: Croco - Rouge
+            (255, 0, 255),  # 5: Schtroumpf - Magenta
         ]
         
         # Backup des labels modifiés
@@ -359,28 +359,29 @@ class AnnotationEditor:
 ║              ÉDITEUR D'ANNOTATIONS YOLO                      ║
 ╠══════════════════════════════════════════════════════════════╣
 ║ SOURIS:                                                      ║
-║  • Clic gauche + Glisser     : Dessiner nouvelle box        ║
-║  • Clic sur box + Glisser    : Déplacer box                 ║
-║  • Clic coin/bord + Glisser  : Redimensionner box          ║
+║  • Clic gauche + Glisser     : Dessiner nouvelle box         ║
+║  • Clic sur box + Glisser    : Déplacer box                  ║
+║  • Clic coin/bord + Glisser  : Redimensionner box            ║
 ║                                                              ║
 ║ CLAVIER:                                                     ║
-║  • ESPACE / Flèche droite    : Image suivante               ║
-║  • Flèche gauche             : Image précédente             ║
-║  • 0-5                       : Changer classe courante      ║
-║  • d / Suppr                 : Supprimer box sélectionnée   ║
-║  • s                         : Sauvegarder                  ║
-║  • r                         : Recharger (annuler modifs)   ║
-║  • h                         : Afficher cette aide          ║
-║  • q / ESC                   : Quitter                      ║
+║  • ESPACE / Flèche droite    : Image suivante                ║
+║  • Flèche gauche             : Image précédente              ║
+║  • 0-5                       : Changer classe (ou classe     ║
+║                                de la box sélectionnée)       ║
+║  • d / Suppr                 : Supprimer box sélectionnée    ║
+║  • s                         : Sauvegarder                   ║
+║  • r                         : Recharger (annuler modifs)    ║
+║  • h                         : Afficher cette aide           ║
+║  • q / ESC                   : Quitter                       ║
 ╠══════════════════════════════════════════════════════════════╣
 ║ CLASSES:                                                     ║
-║  0: Croco       1: Dragibus     2: Oeuf                     ║
-║  3: Ourson      4: Schtroumpf   5: Tagada                   ║
+║  0: Tagada      1: Dragibus     2: Ourson                    ║
+║  3: Oeuf        4: Croco        5: Schtroumpf                ║
 ╠══════════════════════════════════════════════════════════════╣
 ║ REDIMENSIONNEMENT:                                           ║
-║  • Les poignées (cercles) apparaissent sur la box active    ║
-║  • Gros cercles = coins (redim. diagonale)                  ║
-║  • Petits cercles = bords (redim. horizontal/vertical)      ║
+║  • Les poignées (cercles) apparaissent sur la box active     ║
+║  • Gros cercles = coins (redim. diagonale)                   ║
+║  • Petits cercles = bords (redim. horizontal/vertical)       ║
 ╚══════════════════════════════════════════════════════════════╝
 """
         print(help_text)
@@ -476,7 +477,7 @@ class AnnotationEditor:
         cv2.putText(display, "Clic+Glisser=Box | Coins/Bords=Resize | ESPACE: Suivant | <-: Prec | 0-5: Classe | d: Suppr | s: Save | q: Quit", 
                    (10, y_offset), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 255, 255), 1)
         y_offset += 25
-        cv2.putText(display, "Classes: 0:Croco  1:Dragibus  2:Oeuf  3:Ourson  4:Schtroumpf  5:Tagada", 
+        cv2.putText(display, "Classes: 0:Tagada  1:Dragibus  2:Ourson  3:Oeuf  4:Croco  5:Schtroumpf | 0-5 sur box selectionnee change sa classe", 
                    (10, y_offset), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (200, 200, 200), 1)
         
         return display
@@ -560,8 +561,16 @@ class AnnotationEditor:
             
             # Changer de classe (0-5)
             elif ord('0') <= key <= ord('5'):
-                self.current_class = key - ord('0')
-                print(f"🎨 Classe courante: {self.current_class} - {self.classes[self.current_class]}")
+                new_class = key - ord('0')
+                # Si une box est sélectionnée, changer sa classe
+                if self.selected_box is not None and self.selected_box < len(self.current_annotations):
+                    self.current_annotations[self.selected_box][0] = new_class
+                    self.modified = True
+                    print(f"✏️  Box sélectionnée changée en: {self.classes[new_class]}")
+                else:
+                    # Sinon, changer la classe pour les nouvelles boxes
+                    self.current_class = new_class
+                    print(f"🎨 Classe courante: {self.current_class} - {self.classes[self.current_class]}")
             
             # Supprimer box sélectionnée
             elif key == ord('d') or key == 127:  # d ou Delete

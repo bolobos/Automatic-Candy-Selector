@@ -23,13 +23,15 @@ names:
 
 # Paramètres d'augmentation (optionnel, améliore la robustesse)
 hsv_h: 0.1   # Variation de teinte (augmenté)
-hsv_s: 0.7    # Variation de saturation (OK)
-hsv_v: 0.4    # Variation de luminosité (OK)
+hsv_s: 0.8    # Variation de saturation (OK)
+hsv_v: 0.5    # Variation de luminosité (OK)
 degrees: 180.0  # Rotation aléatoire (OK)
 translate: 0.1 # Translation (OK)
 scale: 0.6   # Zoom (réduit de 0.5)
 flipud: 0.5   # Flip vertical (désactivé pour bonbons)
 fliplr: 0.5   # Flip horizontal - IMPORTANT
 mosaic: 1.0   # Augmentation mosaïque - IMPORTANT
-mixupp: 0.1  # Augmentation MixUp (réduit)
+mixup: 0.2  # Augmentation MixUp (réduit)
 perspective: 0.001 # Perspective 
+erasing: 0.2  # Erasing aléatoire (OK)
+copy_paste: 0 # Copy-Paste (désactivé)

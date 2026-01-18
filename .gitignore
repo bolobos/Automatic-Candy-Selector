@@ -15,23 +15,41 @@ ML_Project_Candy/java_app/bin/
 ML_Project_Candy/out/
 *.class
 
-# --- DATASETS (Trop lourd, même pour LFS si c'est inutile) ---
-ML_Project_Candy/python_training/datasets/*old.zip
-ML_Project_Candy/python_training/datasets/yolo_dataset.zip
-ML_Project_Candy/python_training/datasets/images_et_labels.zip
-ML_Project_Candy/python_training/datasets/yolo_dataset/train/
-ML_Project_Candy/python_training/datasets/yolo_dataset/val/
-ML_Project_Candy/python_training/datasets/yolo_dataset/test/
+# --- FICHIERS VOLUMINEUX (plus de LFS, on ignore tout) ---
+# Images
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+*.tiff
+
+# Modèles et fichiers ML
+*.pt
+*.pth
+*.onnx
+*.weights
+*.h5
+
+# Archives
+*.zip
+*.tar
+*.gz
+*.rar
+*.7z
+
+# Fichiers de labels (trop nombreux)
+**/labels/*.txt
+PXL_*/labels/*.txt
+
+# --- DATASETS ---
+ML_Project_Candy/python_training/datasets/
 ML_Project_Candy/python_training/backups/
+PXL_*/
 
 # --- RESULTATS D'ENTRAINEMENT (RUNS) ---
-# On ignore tout le dossier runs pour éviter d'envoyer 
-# les 50 checkpoints intermédiaires inutiles.
 runs/
-!runs/detect/candy_detector_yolov8m4/
 
-# --- EXCEPTIONS POUR LFS ---
-# Ici, on dit : "Même si c'est un .pt, ne l'ignore PAS au niveau global".
-# C'est LFS qui va gérer le poids.
-!*.pt
-!*.onnx
+*.mp4
+*.avi
+*.mov
