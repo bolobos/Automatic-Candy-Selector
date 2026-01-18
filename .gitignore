@@ -49,6 +49,12 @@ PXL_*/
 
 # --- RESULTATS D'ENTRAINEMENT (RUNS) ---
 runs/
+# Exception pour les résultats du modèle m7 (graphiques uniquement)
+!runs/detect/
+runs/detect/*
+!runs/detect/candy_detector_yolov8m7/
+runs/detect/candy_detector_yolov8m7/weights/
+runs/detect/candy_detector_yolov8m7/*.jpg
 
 *.mp4
 *.avi
