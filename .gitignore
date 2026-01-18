@@ -1,6 +1,7 @@
 # --- ENVIRONNEMENT (On touche pas, c'est lourd) ---
 ML_Project_Candy/python_training/yolo_env/
 ML_Project_Candy/python_training/venv/
+ML_Project_Candy/python_training/models/
 __pycache__/
 *.pyc
 .DS_Store
