@@ -91,8 +91,8 @@ def auto_label_dataset(source_dir="nos_dataset/Entrainement", output_dir="yolo_d
     (output_path / "labels" / "train").mkdir(parents=True, exist_ok=True)
     
     # Lire les classes depuis label_names.txt ou détecter automatiquement
-    if Path("label_names.txt").exists():
-        with open("label_names.txt", "r") as f:
+    if Path("../datasets/label_names.txt").exists():
+        with open("../datasets/label_names.txt", "r") as f:
             classes = [line.strip() for line in f if line.strip()]
     else:
         classes = sorted([d.name for d in source_path.iterdir() if d.is_dir()])

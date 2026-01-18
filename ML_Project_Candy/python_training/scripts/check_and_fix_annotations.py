@@ -609,9 +609,9 @@ def main():
     import argparse
     
     parser = argparse.ArgumentParser(description='Vérifier et corriger les annotations YOLO')
-    parser.add_argument('--dataset', default='datasets/yolo_dataset/train',
-                       help='Chemin vers le dataset (défaut: datasets/yolo_dataset/train)')
-    parser.add_argument('--classes', default='datasets/label_names.txt',
+    parser.add_argument('--dataset', default=str(PROJECT_DIR / 'datasets' / 'yolo_dataset' / 'train'),
+                       help='Chemin vers le dataset (défaut: PROJECT_DIR/datasets/yolo_dataset/train)')
+    parser.add_argument('--classes', default=str(PROJECT_DIR / 'datasets' / 'label_names.txt'),
                        help='Fichier des noms de classes')
     parser.add_argument('--start', type=int, default=0,
                        help='Numéro de l\'image de départ (défaut: 0)')

@@ -41,6 +41,6 @@ echo   - q : Quitter
 echo.
 
 cd /d "%~dp0"
-python check_annotations_windows.py
+python scripts\check_annotations_windows.py
 
 pause

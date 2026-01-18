@@ -9,6 +9,10 @@ import shutil
 from pathlib import Path
 from ultralytics import YOLO
 
+# Répertoire du script (pour chemins relatifs)
+SCRIPT_DIR = Path(__file__).parent
+PROJECT_DIR = SCRIPT_DIR.parent
+
 def prepare_dataset():
     """
     Prépare le dataset en convertissant la structure existante
@@ -30,8 +34,9 @@ def prepare_dataset():
     
     # Lire les classes depuis label_names.txt
     classes = []
-    if Path("label_names.txt").exists():
-        with open("label_names.txt", "r") as f:
+    label_names_file = PROJECT_DIR / "datasets" / "label_names.txt"
+    if label_names_file.exists():
+        with open(label_names_file, "r") as f:
             classes = [line.strip() for line in f if line.strip()]
     else:
         # Détecter automatiquement depuis les dossiers
@@ -44,7 +49,8 @@ def prepare_dataset():
     print(f"🏷️  Classes détectées: {classes}")
     
     # Créer le fichier candy.names
-    with open("yolo_models/candy.names", "w") as f:
+    candy_names_file = PROJECT_DIR / "yolo_models" / "candy.names"
+    with open(candy_names_file, "w") as f:
         for cls in classes:
             f.write(f"{cls}\n")
     
@@ -74,20 +80,35 @@ def train_yolov8(model_size='m', epochs=150, img_size=640):
     print(f"⚙️  Paramètres: {epochs} epochs, {img_size}px")
     
     # Vérifier si candy.yaml existe
-    if not Path("candy.yaml").exists():
-        print("❌ Fichier candy.yaml introuvable!")
+    candy_yaml = PROJECT_DIR / "candy.yaml"
+    if not candy_yaml.exists():
+        print(f"❌ Fichier {candy_yaml} introuvable!")
         print("💡 Créez-le avec la commande: python train_yolov8_candy.py --setup")
         return
     
-    # Charger le modèle pré-entraîné
-    model = YOLO(f'yolov8{model_size}.pt')
+    # Charger le modèle pré-entraîné depuis yolo_models
+    model_path = PROJECT_DIR / 'yolo_models' / f'yolov8{model_size}.pt'
+    if not model_path.exists():
+        print(f"⚠️  Modèle {model_path} introuvable, téléchargement automatique...")
+        # Créer le dossier s'il n'existe pas
+        model_path.parent.mkdir(exist_ok=True)
+        # Télécharger avec YOLO, qui va le sauvegarder dans le dossier courant
+        temp_model = YOLO(f'yolov8{model_size}.pt')
+        # Déplacer vers yolo_models
+        temp_path = Path(f'yolov8{model_size}.pt')
+        if temp_path.exists():
+            shutil.move(str(temp_path), str(model_path))
+        model = temp_model
+    else:
+        print(f"📦 Chargement du modèle: {model_path}")
+        model = YOLO(str(model_path))
     
     # Entraîner
-    project_path = "../../runs/detect"
+    project_path = str(PROJECT_DIR.parent.parent / "runs" / "detect")
     name = f'candy_detector_yolov8{model_size}'
     
     results = model.train(
-        data='candy.yaml',
+        data=str(candy_yaml),
         epochs=epochs,
         imgsz=img_size,
         batch=16,
@@ -101,7 +122,8 @@ def train_yolov8(model_size='m', epochs=150, img_size=640):
         save=True,
         plots=True,  # Générer des graphiques de performance
         verbose=True,
-        val=True
+        val=True,
+        amp=True  # Mixed Precision pour réduire l'utilisation GPU
     )
     
     # Récupérer le vrai chemin créé par YOLO (avec numéro incrémenté si besoin)
@@ -118,16 +140,18 @@ def train_yolov8(model_size='m', epochs=150, img_size=640):
         model = YOLO(str(best_model_path))
         model.export(format='onnx', dynamic=False, simplify=True)
         
-        # Déplacer le fichier ONNX dans yolo_models
+        # Déplacer le fichier ONNX dans le dossier models
         onnx_source = str(best_model_path).replace('.pt', '.onnx')
-        onnx_dest = "yolo_models/candy_yolov8.onnx"
+        models_dir = Path('../models')
+        models_dir.mkdir(exist_ok=True)
+        onnx_dest = models_dir / f'candy_yolov8{model_size}.onnx'
         
         if Path(onnx_source).exists():
-            shutil.copy(onnx_source, onnx_dest)
-            print(f"✅ Modèle ONNX copié vers: {onnx_dest}")
-            print(f"\n🎯 Modifiez CandyDetectorYOLO.java pour utiliser:")
+            shutil.copy(onnx_source, str(onnx_dest))
+            print(f"✅ Modèle ONNX exporté vers: {onnx_dest}")
+            print(f"\n🎯 Pour Java, utilisez:")
             print(f'   String modelPath = "{onnx_dest}";')
-            print(f'   String classNamesFile = "yolo_models/candy.names";')
+            print(f'   String classNamesFile = "../python_training/datasets/label_names.txt";')
         else:
             print("❌ Erreur: fichier ONNX non trouvé")
     else:
@@ -138,7 +162,8 @@ def download_pretrained():
     print("📥 Téléchargement de YOLOv8n pré-entraîné...")
     
     # Créer le dossier si nécessaire
-    Path("yolo_models").mkdir(exist_ok=True)
+    yolo_models_dir = PROJECT_DIR / "yolo_models"
+    yolo_models_dir.mkdir(exist_ok=True)
     
     # Télécharger et exporter
     model = YOLO('yolov8n.pt')
@@ -146,13 +171,13 @@ def download_pretrained():
     model.export(format='onnx', dynamic=False, simplify=True)
     
     # Déplacer le fichier
-    shutil.move('yolov8n.onnx', 'yolo_models/yolov8n.onnx')
+    shutil.move('yolov8n.onnx', str(yolo_models_dir / 'yolov8n.onnx'))
     
     # Télécharger coco.names
     import urllib.request
     print("📋 Téléchargement de coco.names...")
     url = "https://raw.githubusercontent.com/AlexeyAB/darknet/master/data/coco.names"
-    urllib.request.urlretrieve(url, "yolo_models/coco.names")
+    urllib.request.urlretrieve(url, str(yolo_models_dir / 'coco.names'))
     
     print("✅ Modèle YOLOv8n ONNX prêt à utiliser!")
     print("🎯 Vous pouvez maintenant lancer CandyDetectorYOLO.java")

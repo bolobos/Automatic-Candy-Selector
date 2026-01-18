@@ -8,9 +8,9 @@ from pathlib import Path
 import random
 
 # Chemins
-test_dir = Path('datasets/nos_dataset/Test')
-train_img_dir = Path('datasets/yolo_dataset/train/images')
-train_lbl_dir = Path('datasets/yolo_dataset/train/labels')
+test_dir = Path('../datasets/nos_dataset/Test')
+train_img_dir = Path('../datasets/yolo_dataset/train/images')
+train_lbl_dir = Path('../datasets/yolo_dataset/train/labels')
 val_img_dir = Path('datasets/yolo_dataset/val/images')
 val_lbl_dir = Path('datasets/yolo_dataset/val/labels')
 nos_test_dir = Path('datasets/nos_dataset/Test')
