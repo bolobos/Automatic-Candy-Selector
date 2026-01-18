@@ -59,6 +59,8 @@ runs/detect/candy_detector_yolov8m7/*.jpg
 !runs/detect/candy_detector_yolov8m14/
 runs/detect/candy_detector_yolov8m14/weights/
 !runs/detect/candy_detector_yolov8m14/*.jpg
+!runs/detect/candy_detector_yolov8m14/args.yaml
+!runs/detect/candy_detector_yolov8m14/results.csv
 
 
 *.mp4
