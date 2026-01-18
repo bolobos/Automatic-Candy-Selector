@@ -52,6 +52,8 @@ public class CandyDetectorApp {
             System.err.println("Sur Windows: java -cp \"bin;lib/opencv-4100.jar\" -Djava.library.path=lib/opencv CandyDetectorApp");
             System.err.println("Sur Linux/WSL: export LD_LIBRARY_PATH=$PWD/lib/opencv:$LD_LIBRARY_PATH");
             System.err.println("              java -cp \"bin:lib/opencv-4100.jar\" -Djava.library.path=lib/opencv CandyDetectorApp");
+            System.err.println("\nDétails de l'erreur:");
+            e.printStackTrace();
             System.exit(1);
         }
         
@@ -60,8 +62,8 @@ public class CandyDetectorApp {
         try {
             // Créer le détecteur
             YOLOv8CandyDetector detector = new YOLOv8CandyDetector(
-                "../python_training/yolo_models/candy_yolov8.onnx",
-                "../python_training/yolo_models/candy.names"
+                "models/candy_yolov8.onnx",
+                "../python_training/datasets/label_names.txt"
             );
             
             System.out.println("\n" + "=".repeat(60));
@@ -131,7 +133,16 @@ public class CandyDetectorApp {
             System.out.println("\n🔍 Analyse de: " + new File(imagePath).getName());
             System.out.println("⏳ Détection en cours...\n");
             
-            List<YOLOv8CandyDetector.Detection> detections = detector.detect(imagePath);
+            // Charger l'image pour l'analyse des couleurs
+            Mat image = Imgcodecs.imread(imagePath);
+            
+            List<YOLOv8CandyDetector.Detection> detections = detector.detect(image);
+            
+            // Analyser les couleurs de chaque détection
+            if (!detections.isEmpty()) {
+                System.out.println("🎨 Analyse des couleurs en cours...\n");
+                detector.analyzeColorsForDetections(image, detections);
+            }
             
             // Afficher les résultats
             System.out.println("=".repeat(60));
@@ -148,17 +159,46 @@ public class CandyDetectorApp {
                         i + 1, det.className, det.confidence * 100);
                     System.out.printf("     Position: [%.0f, %.0f] Taille: %.0f x %.0f px\n",
                         det.box.x, det.box.y, det.box.width, det.box.height);
+                    
+                    // Afficher l'analyse des couleurs
+                    if (det.colorAnalysis != null) {
+                        System.out.println("     🎨 Analyse des couleurs:");
+                        System.out.printf("        Couleur dominante: %s\n", det.colorAnalysis.dominantColor);
+                        System.out.printf("        BGR moyen: (%.0f, %.0f, %.0f)\n", 
+                            det.colorAnalysis.avgBGR[0], 
+                            det.colorAnalysis.avgBGR[1], 
+                            det.colorAnalysis.avgBGR[2]);
+                        System.out.printf("        HSV moyen: (%.0f, %.0f, %.0f)\n", 
+                            det.colorAnalysis.avgHSV[0], 
+                            det.colorAnalysis.avgHSV[1], 
+                            det.colorAnalysis.avgHSV[2]);
+                        System.out.println("        Proportions:");
+                        for (java.util.Map.Entry<String, Double> entry : det.colorAnalysis.colorProportions.entrySet()) {
+                            System.out.printf("          - %s: %.1f%%\n", entry.getKey(), entry.getValue());
+                        }
+                    }
+                    System.out.println();
                 }
             }
             
             // Sauvegarder l'image avec les détections
-            Mat image = Imgcodecs.imread(imagePath);
             Mat result = detector.drawDetections(image, detections);
             String outputPath = "detection_result.jpg";
             Imgcodecs.imwrite(outputPath, result);
             
-            System.out.println("\n" + "=".repeat(60));
-            System.out.println("💾 Résultat sauvegardé: " + outputPath);
+            // Extraire et sauvegarder chaque bonbon détecté séparément
+            if (!detections.isEmpty()) {
+                System.out.println("\n✂️ Extraction des objets détectés...");
+                List<String> extractedPaths = detector.extractAllDetections(image, detections, "candy_extracted");
+                System.out.println("✅ " + extractedPaths.size() + " objet(s) extrait(s):");
+                for (String path : extractedPaths) {
+                    System.out.println("   - " + path);
+                }
+            }
+            
+            System.out.println("\n=".repeat(60));
+            System.out.println("💾 Résultats sauvegardés:");
+            System.out.println("   - " + outputPath + " (image avec détections)");
             System.out.println("=".repeat(60));
             
         } catch (IOException e) {
