@@ -3,7 +3,8 @@
 ╚════════════════════════════════════════════════════════════════════╝
 
 📅 Date : 18 janvier 2026
-📦 Taille totale : 5.5 GB (5.3 GB dataset + 225 MB code/modèles)
+📦 Taille code/modèles : ~300 MB (datasets exclus du Git)
+🎯 Modèle actuel : YOLOv8m14 (98% mAP50)
 
 ═══════════════════════════════════════════════════════════════════════
                          📁 STRUCTURE FINALE
@@ -11,60 +12,69 @@
 
 Automatic-Candy-Selector/
 │
-├── README.md                          # Documentation principale
+├── README.md                          # 📖 Documentation principale
+├── ETAT_FINAL.txt                    # 📋 État détaillé du projet
+├── .gitignore                        # Configuration Git (datasets exclus)
 │
-└── ML_Project_Candy/
-    │
-    ├── java_app/                      # Application Java (225 MB)
-    │   ├── src/
-    │   │   ├── CandyDetectorApp.java      # ⭐ Application principale
-    │   │   └── YOLOv8CandyDetector.java   # Classe de détection
-    │   ├── bin/                           # Classes compilées (60 KB)
-    │   ├── lib/                           # Bibliothèques OpenCV
-    │   ├── old_models/
-    │   │   ├── candy_yolov8.onnx         # Modèle YOLOv8s (43 MB)
-    │   │   └── candy.names               # 6 classes
-    │   ├── compile.sh                    # Script compilation
-    │   ├── run.sh                        # ⭐ Script exécution
-    │   ├── DetecteurBonbons.bat         # Lancement Windows
-    │   └── GUIDE_UTILISATION.txt        # Instructions complètes
-    │
-    └── python_training/               # Entraînement Python (5.3 GB)
-        ├── datasets/
-        │   ├── label_names.txt           # 📝 Noms des 6 classes
-        │   ├── yolo_dataset/             # Dataset formaté YOLO
-        │   │   ├── train/                # Images + labels entraînement
-        │   │   ├── val/                  # Images + labels validation
-        │   │   └── test/                 # Images + labels test
-        │   └── nos_dataset/              # Dataset original
-        │       ├── Entrainement/         # 1294 images
-        │       └── Test/                 # 228 images
-        ├── scripts/                      # 📂 Tous les scripts Python
-        │   ├── train_yolov8_candy.py    # ⭐ Entraînement principal
-        │   ├── export_and_stats.py      # Export ONNX + statistiques
-        │   ├── create_val_from_test.py  # Création validation set
-        │   ├── auto_label_images.py     # Annotation automatique
-        │   ├── shuffle_dataset.py       # Mélange train/val
-        │   ├── rebalance_dataset.py     # Rééquilibrage classes
-        │   ├── split_dataset.py         # Division dataset
-        │   ├── distribute_video_frames.py # Distribution frames vidéo
-        │   ├── export_onnx.py           # Export rapide ONNX
-        │   ├── backup_before_large.py   # Sauvegarde avant entraînement
-        │   ├── check_and_fix_annotations.py # Éditeur annotations graphique
-        │   └── auto_label_single_candy.py   # Annotation image unique
-        ├── models/                       # Modèles + backups
-        │   └── yolo_training/            # Modèles entraînés
-        ├── backups/                      # Sauvegardes annotations
-        ├── yolo_models/                  # Modèles YOLO base
-        ├── candy.yaml                    # ⭐ Configuration dataset YOLO
-        ├── check_annotations.bat         # Vérification train (WSL+X11)
-        ├── check_annotations_val.bat     # Vérification val (WSL+X11)
-        ├── check_annotations_WIN.bat     # Vérification Windows natif
-        └── verify_annotations_simple.bat # Vérification sans GUI
+├── ML_Project_Candy/
+│   │
+│   ├── java_app/                      # ☕ Application Java (225 MB)
+│   │   ├── src/
+│   │   │   ├── CandyDetectorApp.java      # ⭐ Application principale
+│   │   │   ├── YOLOv8CandyDetector.java   # Détection YOLO
+│   │   │   ├── VideoFrameExtractor.java   # Extraction frames vidéo
+│   │   │   ├── ColorIdentificator3000.java # (Expérimental)
+│   │   │   └── ImageClassifier.java       # (Expérimental)
+│   │   ├── bin/                           # Classes compilées
+│   │   ├── lib/opencv/                    # OpenCV 4.10.0
+│   │   ├── old_models/
+│   │   │   ├── candy_yolov8.onnx         # Ancien modèle s
+│   │   │   └── candy.names               # 6 classes
+│   │   ├── compile.sh                    # Compilation Linux/WSL
+│   │   ├── run.sh                        # ⭐ Exécution Linux/WSL
+│   │   ├── DetecteurBonbons.bat         # Lancement Windows
+│   │   └── GUIDE_UTILISATION.txt        # Instructions Java
+│   │
+│   ├── models/
+│   │   └── candy_yolov8m.onnx            # ⭐ Modèle YOLOv8m (98% mAP50)
+│   │
+│   └── python_training/               # 🐍 Scripts Python
+│       ├── datasets/
+│       │   ├── label_names.txt           # ⭐ 6 classes de bonbons
+│       │   └── yolo_dataset/             # Dataset YOLO (Git ignored)
+│       │       ├── train/                # 1294 images + labels
+│       │       ├── val/                  # 228 images + labels
+│       │       └── test/                 # Images test
+│       ├── scripts/                      # 📂 13 scripts Python
+│       │   ├── train_yolov8_candy.py    # ⭐ Entraînement
+│       │   ├── export_and_stats.py      # Export ONNX
+│       │   ├── check_and_fix_annotations.py # Éditeur GUI
+│       │   ├── auto_label_images.py     # Auto-annotation
+│       │   ├── auto_label_single_candy.py
+│       │   ├── shuffle_dataset.py
+│       │   ├── rebalance_dataset.py
+│       │   ├── split_dataset.py
+│       │   ├── distribute_video_frames.py
+│       │   ├── create_val_from_test.py
+│       │   ├── backup_before_large.py
+│       │   ├── check_test_dataset.py
+│       │   └── test_yolo_model.py
+│       ├── models/
+│       │   └── yolo_training/            # Modèles entraînés
+│       ├── backups/                      # Sauvegardes annotations
+│       ├── yolo_models/                  # Modèles YOLO base (Git ignored)
+│       ├── candy.yaml                    # ⭐ Config YOLOv8
+│       ├── check_annotations.bat         # Éditeur train (WSL+X11)
+│       ├── check_annotations_val.bat     # Éditeur val (WSL+X11)
+│       └── check_annotations_WIN.bat     # Éditeur Windows natif
+│
+└── runs/detect/                       # 📊 Résultats entraînements
+    ├── candy_detector_yolov8m7/       # Modèle référence (args+results+jpg)
+    └── candy_detector_yolov8m14/      # ⭐ Modèle actuel (args+results+jpg)
 
 
 ═══════════════════════════════════════════════════════════════════════
-                    🎯 MODÈLE YOLOV8M ENTRAÎNÉ
+                    🎯 MODÈLE YOLOV8M14 (ACTUEL)
 ═══════════════════════════════════════════════════════════════════════
 
 📊 PERFORMANCES
@@ -75,8 +85,10 @@ Automatic-Candy-Selector/
 
 ⏱️  ENTRAÎNEMENT
    Modèle       : YOLOv8m (Medium)
+   Version      : candy_detector_yolov8m14
    Epochs       : 100+
    GPU          : NVIDIA RTX 3060 Ti
+   Fichier ONNX : ML_Project_Candy/models/candy_yolov8m.onnx
 
 📂 DATASET
    Total        : 1522 images
@@ -90,54 +102,61 @@ Automatic-Candy-Selector/
                        🚀 UTILISATION RAPIDE
 ═══════════════════════════════════════════════════════════════════════
 
-1️⃣  COMPILATION JAVA (une seule fois)
+1️⃣  DÉTECTION JAVA
    cd ML_Project_Candy/java_app
-   bash compile.sh
+   
+   # Linux/WSL
+   bash compile.sh                # Compilation (1 fois)
+   bash run.sh                    # Exécution
+   
+   # Windows
+   DetecteurBonbons.bat          # Lancement direct
 
-2️⃣  EXÉCUTION DÉTECTION
-   bash run.sh
-   → Menu interactif pour choisir une image
-   → Résultat sauvegardé dans detection_result.jpg
-
-3️⃣  ENTRAÎNEMENT PYTHON
+2️⃣  ENTRAÎNEMENT PYTHON
    cd ML_Project_Candy/python_training
    python scripts/train_yolov8_candy.py --model m --epochs 100
 
-4️⃣  ANNOTATION INTERACTIVE
-   # Sous WSL avec X11 server
-   ./check_annotations.bat
+3️⃣  ANNOTATION INTERACTIVE
+   # WSL avec X11 server (VcXsrv/Xming)
+   ./check_annotations.bat              # Dataset train
+   ./check_annotations_val.bat          # Dataset validation
    
-   # Sous Windows natif
+   # Windows natif
    ./check_annotations_WIN.bat
 
+4️⃣  EXPORT ONNX
+   python scripts/export_and_stats.py
+   → Génère models/candy_yolov8m.onnx
+
 
 ═══════════════════════════════════════════════════════════════════════
-                    🧹 ORGANISATION DU CODE
+                    🧹 ORGANISATION ET NETTOYAGE
 ═══════════════════════════════════════════════════════════════════════
 
-✅ RÉORGANISATION EFFECTUÉE (18/01/2026) :
-   • Tous les scripts Python déplacés dans scripts/
-     → 13 scripts regroupés et organisés
+✅ ORGANISATION EFFECTUÉE (18/01/2026) :
+   • Tous les scripts Python regroupés dans scripts/
+     → 13 scripts organisés et documentés
      → Chemins relatifs automatiquement corrigés
-     → Meilleure lisibilité et maintenance
+   
+   • Runs d'entraînement nettoyés
+     → Conservés: m7 (référence) et m14 (actuel)
+     → Git: args.yaml + results.csv (tracking)
+     → Ignorés: poids .pt (trop volumineux)
+   
+   • .gitignore optimisé
+     → Datasets exclus (5.3 GB locaux)
+     → Environnements virtuels ignorés
+     → Seuls les fichiers essentiels trackés
    
    • Classes correctement définies
      → label_names.txt : ordre des 6 classes
-     → candy.yaml : configuration conforme (nc: 6)
+     → candy.yaml : configuration YOLOv8 (nc: 6)
      → Cohérence vérifiée partout
 
-✅ PRÉCÉDEMMENT NETTOYÉ :
-   • Environnements virtuels obsolètes supprimés
-     → ~/yolo_training_env (WSL home)
-   
-   • READMEs et scripts shell dupliqués supprimés
-     → Documentation centralisée
-   
-   • Modèles YOLO de base téléchargés nettoyés
-     → Seuls les modèles entraînés conservés
-   
-   • Fichiers cache Python supprimés
-   • Dossiers vides supprimés
+✅ DOCUMENTATION MISE À JOUR :
+   • README.md : structure actuelle + guide complet
+   • ETAT_FINAL.txt : état détaillé du projet
+   • GUIDE_UTILISATION.txt : instructions Java
 
 
 ═══════════════════════════════════════════════════════════════════════
@@ -145,20 +164,22 @@ Automatic-Candy-Selector/
 ═══════════════════════════════════════════════════════════════════════
 
 OS        : Windows 11 avec WSL Ubuntu
-Python    : 3.12 (env: ~/yolo_training_env)
+Python    : 3.12+ (ultralytics, opencv-python, numpy)
 Java      : OpenJDK avec OpenCV 4.10.0
-GPU       : NVIDIA RTX 3060 Ti (optionnel pour entraînement)
+GPU       : NVIDIA RTX 3060 Ti (recommandé pour entraînement)
 
 
 ═══════════════════════════════════════════════════════════════════════
                          📖 DOCUMENTATION
 ═══════════════════════════════════════════════════════════════════════
 
-• README.md                               → Vue d'ensemble du projet
+• README.md                                → Vue d'ensemble + guide rapide
+• ETAT_FINAL.txt                          → État détaillé du projet
 • java_app/GUIDE_UTILISATION.txt         → Guide complet Java
 • python_training/scripts/                → Scripts Python documentés
-• python_training/datasets/label_names.txt → ⭐ Classes de bonbons
+• python_training/datasets/label_names.txt → ⭐ 6 classes de bonbons
 • python_training/candy.yaml              → ⭐ Configuration YOLOv8
+• runs/detect/candy_detector_yolov8m14/   → Résultats modèle actuel
 
 
 ═══════════════════════════════════════════════════════════════════════
@@ -166,13 +187,14 @@ GPU       : NVIDIA RTX 3060 Ti (optionnel pour entraînement)
 ═══════════════════════════════════════════════════════════════════════
 
 🎓 ENTRAÎNEMENT :
-   • train_yolov8_candy.py         → Entraînement YOLOv8 (n/s/m/l/x)
-   • export_and_stats.py           → Export ONNX + métriques
+   • train_yolov8_candy.py         → ⭐ Entraînement YOLOv8 (n/s/m/l/x)
+   • export_and_stats.py           → Export ONNX + métriques complètes
    • export_onnx.py                → Export rapide ONNX
-   • backup_before_large.py        → Sauvegarde avant gros entraînement
+   • train_adaptive_model.py       → (Expérimental) Entraînement adaptatif
+   • backup_before_large.py        → Sauvegarde avant entraînement
 
 📝 ANNOTATION :
-   • check_and_fix_annotations.py  → Éditeur graphique (OpenCV)
+   • check_and_fix_annotations.py  → ⭐ Éditeur graphique OpenCV
    • auto_label_images.py          → Annotation automatique batch
    • auto_label_single_candy.py    → Annotation image unique
 
