@@ -44,7 +44,7 @@ PXL_*/labels/*.txt
 
 # --- DATASETS ---
 ML_Project_Candy/python_training/datasets/
-ML_Project_Candy/python_training/backups/*
+ML_Project_Candy/python_training/backups/
 PXL_*/
 
 # --- RESULTATS D'ENTRAINEMENT (RUNS) ---
