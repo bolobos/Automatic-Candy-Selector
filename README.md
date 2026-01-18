@@ -142,11 +142,14 @@ python scripts/export_and_stats.py
 ## 📊 Performances du modèle actuel
 
 - **Modèle** : YOLOv8m (Medium) - `candy_detector_yolov8m14`
-- **mAP50** : 98%+ (optimisé)
-- **mAP50-95** : 95%+
-- **Précision** : 96%+
-- **Recall** : 96%+
-- **Fichier** : `ML_Project_Candy/models/candy_yolov8m.onnx`
+- **Entraînement** : 100 epochs (58 min sur RTX 3060 Ti)
+- **mAP50** : 99.5% ⭐
+- **mAP50-95** : 97.56%
+- **Précision** : 98.63%
+- **Recall** : 99.95%
+- **Batch size** : 16
+- **Image size** : 640x640
+- **Fichier ONNX** : `ML_Project_Candy/models/candy_yolov8m.onnx`
 - **Dataset** : 1522 images (1294 train / 228 val)
 - **Classes** : 6 bonbons (Tagada, Dragibus, Ourson, Oeuf, Croco, Schtroumpf)
 

@@ -77,16 +77,18 @@ Automatic-Candy-Selector/
                     🎯 MODÈLE YOLOV8M14 (ACTUEL)
 ═══════════════════════════════════════════════════════════════════════
 
-📊 PERFORMANCES
-   mAP50        : 98%+    (modèle optimisé)
-   mAP50-95     : 95%+
-   Précision    : 96%+
-   Recall       : 96%+
+📊 PERFORMANCES (epoch 100)
+   mAP50        : 99.5% ⭐  (modèle optimisé)
+   mAP50-95     : 97.56%
+   Précision    : 98.63%
+   Recall       : 99.95%
 
 ⏱️  ENTRAÎNEMENT
    Modèle       : YOLOv8m (Medium)
    Version      : candy_detector_yolov8m14
-   Epochs       : 100+
+   Epochs       : 100 (58 minutes)
+   Batch size   : 16
+   Image size   : 640x640
    GPU          : NVIDIA RTX 3060 Ti
    Fichier ONNX : ML_Project_Candy/models/candy_yolov8m.onnx
 
