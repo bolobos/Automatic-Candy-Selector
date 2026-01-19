@@ -24,6 +24,14 @@ ML_Project_Candy/out/
 *.bmp
 *.tiff
 
+# Exception: dossier Images à la racine
+!Images/*.jpg
+!Images/*.jpeg
+!Images/*.png
+!Images/*.gif
+!Images/*.bmp
+!Images/*.tiff
+
 # Modèles et fichiers ML
 *.pt
 *.pth
