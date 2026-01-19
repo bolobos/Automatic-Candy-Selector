@@ -172,9 +172,10 @@ python scripts/export_and_stats.py
 ## 🎓 Crédits
 
 **Projet IN450/451** - Machine Learning  
-**École** : ESME Sudria - Promotion 2026  
+**École** : ESISAR - P2027APP
 **Auteur** : Rémi C.
 
 ---
 
 **Dernière mise à jour** : 18 janvier 2026
+
